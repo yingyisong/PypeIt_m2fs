@@ -36,6 +36,8 @@ from pypeit.spectrographs import vlt_sinfoni
 from pypeit.spectrographs import wht_isis
 from pypeit.spectrographs import ntt_efosc2
 
+# added by YYS on 06/13/2021, 10/09/2021, 05/07/2022
+from pypeit.spectrographs import magellan_m2fs
 
 # Build the list of names for the available spectrographs
 
