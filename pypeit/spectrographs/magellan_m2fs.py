@@ -60,10 +60,11 @@ class MagellanM2FSSpectrograph(spectrograph.Spectrograph):
         #par['calibrations']['slitedges']['auto_pca'] = False
         par['calibrations']['slitedges']['fwhm_gaussian'] = 1.0
         par['calibrations']['slitedges']['fwhm_uniform'] = 1.0
-        par['calibrations']['slitedges']['left_right_pca'] = True
-        #par['calibrations']['slitedges']['det_min_spec_length'] = 0.2
-        par['calibrations']['slitedges']['fit_min_spec_length'] = 0.2
-        #par['calibrations']['slitedges']['smash_range'] = [0.33,0.72]
+        par['calibrations']['slitedges']['left_right_pca'] = False #True
+        par['calibrations']['slitedges']['det_min_spec_length'] = 0.1
+        par['calibrations']['slitedges']['fit_min_spec_length'] = 0.1
+        par['calibrations']['slitedges']['smash_range'] = [0.2,0.4]
+        #par['calibrations']['slitedges']['pca_n'] = 180
         #par['calibrations']['slitedges']['length_range'] = 0.5
         # TODO: I had to increase this from 1. to 2. to deal with
         # Keck_LRIS_red/multi_1200_9000_d680_1x2/ . May need a
@@ -512,11 +513,11 @@ class MagellanM2FSBSpectrograph(MagellanM2FSSpectrograph):
         binning = parse.parse_binning(self.get_meta_value(scifile, 'binning'))
         par['calibrations']['wavelengths']['fwhm'] = 8.0 / binning[0]
 
-        # Slit tracing
-        # Reduce the slit parameters because the flux does not span the full detector
-        #   It is primarily on the upper half of the detector (usually)
-        if self.get_meta_value(scifile, 'dispname') == '300/5000':
-            par['calibrations']['slitedges']['smash_range'] = [0.5, 1.]
+        ### # Slit tracing
+        ### # Reduce the slit parameters because the flux does not span the full detector
+        ### #   It is primarily on the upper half of the detector (usually)
+        ### if self.get_meta_value(scifile, 'dispname') == '300/5000':
+        ###     par['calibrations']['slitedges']['smash_range'] = [0.5, 1.]
 
         # Return
         return par
@@ -567,7 +568,7 @@ class MagellanM2FSBSpectrograph(MagellanM2FSSpectrograph):
             hdu = io.fits_open(filename)
             binspatial, binspec = parse.parse_binning(hdu[0].header['BINNING'])
             hdu.close()
-            msgs.info("Custom bad pixel mask for M2FS with spatial binning=%d\t%d,%d"%(binspatial,np.int(0.33*4096//binspatial),np.int(0.72*4096//binspatial)))
+            #msgs.info("Custom bad pixel mask for M2FS with spatial binning=%d\t%d,%d"%(binspatial,np.int(0.1*4096//binspatial),np.int(0.5*4096//binspatial)))
 
             #bpm_img[:np.int(0.33*4096//binspatial),:] = 1.
             #bpm_img[np.int(0.72*4096//binspatial):,:] = 1.
@@ -684,7 +685,7 @@ class MagellanM2FSRSpectrograph(MagellanM2FSSpectrograph):
         """
         par = super().default_pypeit_par()
 
-        par['calibrations']['slitedges']['edge_thresh'] = 20.
+        par['calibrations']['slitedges']['edge_thresh'] = 30. #20.
 
         # 1D wavelength solution
         par['calibrations']['wavelengths']['lamps'] = ['NeI', 'ArI', 'CdI', 'KrI', 'XeI', 'ZnI', 'HgI']
@@ -735,7 +736,7 @@ class MagellanM2FSRSpectrograph(MagellanM2FSSpectrograph):
         # Unbinned LRISr needs very aggressive LACosmics parameters for 1x1 binning
         if binning == '1,1':
             sigclip = 3.0
-            objlim = 0.5
+            objlim = 3. #0.5
             par['scienceframe']['process']['sigclip'] = sigclip
             par['scienceframe']['process']['objlim'] = objlim
 
